@@ -18,6 +18,8 @@
     font-family:system-ui, "Segoe UI", "Heebo", "Rubik", Arial, sans-serif; color:var(--text);
   }
   .container{max-width:1100px;margin:0 auto;padding:20px}
+  @media (max-width:768px){.container{padding:12px}}
+  
   header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
   .brand{display:flex;align-items:center;gap:12px}
   .logo{
@@ -28,17 +30,29 @@
     box-shadow:0 10px 25px rgba(0,0,0,.25), inset 0 0 12px rgba(255,255,255,.15);
   }
   h1{font-size:1.3rem;margin:0 0 2px}
+  @media (max-width:768px){h1{font-size:1.05rem}}
+  
   .subtitle{color:var(--muted);font-size:1.35rem;background-color: #465076;text-align: center;
 border-radius: 5px;padding: 5px;}
+  @media (max-width:768px){.subtitle{font-size:1rem;padding:8px}}
+  
+  .adkani{font-size:1.05rem;color:#d4e0ff;margin:4px 0 0;font-weight:500}
+  @media (max-width:768px){.adkani{font-size:.85rem;margin:2px 0 0}}
 
   /* Stepper */
   .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:16px 0 10px}
+  @media (max-width:768px){.steps{gap:3px;margin:12px 0 8px}}
+  
   .step{
     position:relative;padding:10px 12px;border-radius:14px;background:#0f1630;border:1px solid #1c254d;
     color:#a6b1cc;text-align:center;font-size:.9rem;user-select:none;
   }
+  @media (max-width:768px){.step{padding:8px 4px;font-size:.65rem;border-radius:8px}}
+  
   .step.active{background:linear-gradient(180deg,#131c3f,#0f1630);color:#eaf1ff;
     font-weight: bold; border-color:#30407a;box-shadow:0 0 0 3px var(--ring)}
+  @media (max-width:768px){.step.active{box-shadow:0 0 0 2px var(--ring)}}
+  
   .step:before{content:"";position:absolute;inset:auto 0 -6px 0;margin:auto;width:50%;height:4px;border-radius:4px;background:transparent;transition:.25s}
   .step.active:before{background:linear-gradient(90deg,var(--primary),var(--accent))}
 
@@ -48,89 +62,140 @@ border-radius: 5px;padding: 5px;}
     border:1px solid #1b264d;box-shadow:0 10px 30px rgba(0,0,0,.35);font-weight: bold;
     padding:18px;display:none;transform:translateY(12px) scale(.98);pointer-events:none;transition:opacity .35s, transform .35s;
   }
+  @media (max-width:768px){.panel{padding:12px;border-radius:12px}}
+  
   .panel.show{display:block;transform:translateY(0) scale(1);pointer-events:auto}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  
   label{display:block;font-size:.9rem;color:#c2c9db;margin-bottom:6px}
+  @media (max-width:768px){label{font-size:.85rem}}
+  
   .input{
-    width:100%;padding:12px 14px;border-radius:12px;border:1px solid #243058;background:whit;color:black;font-size:1rem;
+    width:100%;padding:12px 14px;border-radius:12px;border:1px solid #243058;background:white;color:black;font-size:1rem;
     outline:none;transition:.2s;
   }
+  @media (max-width:768px){.input{padding:10px;font-size:.9rem}}
+  
   .input:focus{border-color:#3b4ea3;box-shadow:0 0 0 3px var(--ring)}
   .help{font-size:.82rem;color:#9aa7c7;margin-top:6px}
+  @media (max-width:768px){.help{font-size:.75rem}}
+  
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  @media (max-width:768px){.row{gap:6px}}
+  
   .btn{
     padding:12px 16px;border:none;border-radius:12px;background:linear-gradient(90deg,#3a86ff,#4cc9f0);
     color:white;font-weight:600;cursor:pointer;transition:transform .08s ease, box-shadow .2s;
-    box-shadow:0 8px 18px rgba(76,201,240,.2);
+    box-shadow:0 8px 18px rgba(76,201,240,.2);font-size:1rem;
   }
+  @media (max-width:768px){.btn{padding:10px 12px;font-size:.9rem}}
+  
   .btn:hover{transform:translateY(-1px)}
   .btn:active{transform:translateY(1px)}
   .btn.secondary{background:#1a2246;color:#eaf1ff;border:1px solid #2a366e;box-shadow:none}
   .btn.warn{background:linear-gradient(90deg,#f97316,#f59e0b)}
   .btn.ghost{background:transparent;border:1px dashed #3b4ea3;color:#b8c7ff}
   .stack{display:flex;gap:10px;flex-wrap:wrap}
+  @media (max-width:768px){.stack{gap:6px}}
+  
   .spacer{height:8px}
   .pill{padding:8px 12px;border-radius:999px;background:#10193a;border:1px solid #243058;color:#dbe4ff;font-size:.88rem}
+  @media (max-width:768px){.pill{padding:6px 10px;font-size:.8rem}}
+  
   .note{font-size:.9rem;color:#aab6d6}
+  @media (max-width:768px){.note{font-size:.8rem}}
+  
   .mono{font-variant-numeric:tabular-nums;text-align: center;}
   .kpi{
     display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px
   }
   @media (max-width:900px){.kpi{grid-template-columns:1fr 1fr}}
+  @media (max-width:500px){.kpi{grid-template-columns:1fr;gap:8px}}
+  
   .kpi .card{
     background:#0e1634;border:1px solid #1d2952;border-radius:16px;padding:14px;min-height:84px
   }
+  @media (max-width:768px){.kpi .card{padding:10px;min-height:70px;border-radius:12px}}
+  
   .title{white-space: nowrap;}
+  @media (max-width:768px){.title{white-space:normal}}
+  
   .kpi .title{font-size:.85rem;color:#a8b3d4}
+  @media (max-width:768px){.kpi .title{font-size:.75rem}}
+  
   .kpi .value{font-size:1.15rem;margin-top:6px;font-weight:700}
+  @media (max-width:768px){.kpi .value{font-size:.95rem;margin-top:4px}}
 
   /* Table */
   table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px}
   thead th{
     position:sticky;top:0;background:#0f183a;border-bottom:1px solid #26305d;padding:10px;font-size:.92rem;color:#c9d3f3;z-index:1
   }
+  @media (max-width:768px){
+    thead th{padding:6px 4px;font-size:.7rem}
+  }
   tbody td{border-bottom:1px dashed #1f2a57;padding:10px;color:#e7ecff}
+  @media (max-width:768px){
+    tbody td{padding:6px 4px;font-size:.75rem}
+  }
   tbody tr:hover{background:#0c1432}
   .td-num{font-variant-numeric:tabular-nums;text-align:left;direction:ltr}
+  @media (max-width:768px){
+    .td-num{font-size:.7rem}
+  }
   .input-num{
     width:100%;padding:10px;border-radius:10px;border:1px solid #22305c;background:#0a1230;color:#eaf1ff;direction:ltr;text-align:left
+  }
+  @media (max-width:768px){
+    .input-num{padding:6px;font-size:.8rem}
   }
 
   /* 3D Pie (SVG illusion) */
   .pie-wrap{display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px}
+  @media (max-width:768px){.pie-wrap{gap:12px}}
+  
   .pie{
     width:280px;max-width:100%;
     filter: drop-shadow(0 14px 24px rgba(0,0,0,.45));
     transform: perspective(900px) rotateX(18deg);
   }
+  @media (max-width:768px){.pie{width:200px}}
+  
   .legend{display:flex;flex-direction:column;gap:8px}
+  @media (max-width:768px){.legend{gap:6px}}
+  
   .legend .item{display:flex;align-items:center;gap:8px}
+  @media (max-width:768px){.legend .item{gap:6px;font-size:.85rem}}
+  
   .swatch{width:14px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,.15)}
+  @media (max-width:768px){.swatch{width:12px;height:12px}}
+  
   .swatch.taxable{background:linear-gradient(180deg,#f72585,#b5179e)}
   .swatch.exempt{background:linear-gradient(180deg,#34d399,#10b981)}
 
   /* Alerts */
   .alert{border:1px solid #33407a;background:#0d173a;border-radius:12px;padding:10px;font-size:.95rem}
+  @media (max-width:768px){.alert{padding:8px;font-size:.82rem;border-radius:8px}}
+  
   .alert.ok{border-color:rgba(45,212,191,.35);background:rgba(13,148,136,.08)}
   .alert.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08)}
   .alert.danger{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08)}
 
   .footer-note{margin-top:18px;color:#93a0c2;font-size:.85rem}
+  @media (max-width:768px){.footer-note{font-size:.75rem;margin-top:12px}}
 </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="brand">
-       
         <div>
           <h1>סימולטור פריסת מענק פרישה</h1>
-          <div class="subtitle">לפי סעיף 8ג לפקודת מס הכנסה —  פריסת מענקי פרישה</div>
+          <div class="subtitle">לפי סעיף 8ג לפקודת מס הכנסה — פריסת מענקי פרישה</div>
           <h3 class="adkani">עדכני לנתוני רשות המיסים לשנת 2025</h3>
         </div>
       </div>
-      
     </header>
 
     <div class="steps">
@@ -192,7 +257,7 @@ border-radius: 5px;padding: 5px;}
           <div class="value mono" id="kpi-tenure">0.00</div>
         </div>
         <div class="card">
-          <div class="title"> תקרת שכר</div>
+          <div class="title">תקרת שכר</div>
           <div class="value mono" id="kpi-basePerYear">0.00 ש"ח</div>
         </div>
         <div class="card">
@@ -210,7 +275,6 @@ border-radius: 5px;padding: 5px;}
         <div class="legend">
           <div class="item"><span class="swatch exempt"></span> פטור</div>
           <div class="item"><span class="swatch taxable"></span> חייב</div>
-          
         </div>
       </div>
 
@@ -340,7 +404,7 @@ border-radius: 5px;padding: 5px;}
         </div>
         <div class="card">
           <div class="title">שנות פריסה שנבחרו</div>
-          <div class="value mono" id="sum-years" >0</div>
+          <div class="value mono" id="sum-years">0</div>
         </div>
       </div>
 
@@ -359,9 +423,6 @@ border-radius: 5px;padding: 5px;}
   </div>
 
 <script>
-/* =========================
-   קבועים שנתיים (ניתנים לעדכון)
-=========================== */
 const INCOME_TAX_BRACKETS = [
     { limit: 84120, rate: 0.10 },
     { limit: 120720, rate: 0.14 },
@@ -375,9 +436,6 @@ const CREDIT_POINTS = { male: 2.25, female: 2.75 };
 const DEFAULT_SALARY_CAP = 13750;
 const CREDIT_POINT_VALUE = 2904;
 
-/* =========================
-   כלי עזר לפורמט מספרים
-=========================== */
 function fmtMoney(v){
   if(isNaN(v) || v==null) v=0;
   return v.toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2})+" ש\"ח";
@@ -392,9 +450,6 @@ function parseNum(el){
   return parseFloat(clean)||0;
 }
 
-/* =========================
-   לוגיקת חישוב מס
-=========================== */
 function calcTax(income, gender){
   let tax=0, prev=0;
   for(const b of INCOME_TAX_BRACKETS){
@@ -408,14 +463,9 @@ function calcTax(income, gender){
   return Math.max(0,tax-credits);
 }
 
-/* =========================
-   מעבר מסכים
-=========================== */
 function showPanel(n){
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("show"));
   document.querySelector("#panel-"+n).classList.add("show");
-  //if(n===2) document.querySelector("#panel-1").classList.add("show");
-  //if(n===3) document.querySelector("#panel-3").classList.add("show");
   if(n===4) {
     document.querySelector("#panel-4").classList.add("show")
     document.querySelector("#panel-5").classList.add("show");
@@ -425,9 +475,6 @@ function showPanel(n){
   document.querySelector('.step[data-step="'+n+'"]').classList.add("active");
 }
 
-/* =========================
-   חישוב נתוני בסיס
-=========================== */
 function calcBase(){
   const grantTotal = parseNum(document.querySelector("#grantTotal"));
   const lastSalary = parseNum(document.querySelector("#lastSalary"));
@@ -448,9 +495,6 @@ function calcBase(){
   return {grantTotal,lastSalary,salaryCap,tenureYears,basePerYear,exempt,taxable};
 }
 
-/* =========================
-   גרף עוגה SVG
-=========================== */
 function drawPie(exempt,taxable){
   const total = exempt+taxable||1;
   const pct = taxable/total;
@@ -476,9 +520,6 @@ function drawPie(exempt,taxable){
   svg.innerHTML=defs+svg.innerHTML;
 }
 
-/* =========================
-   יצירת טבלה
-=========================== */
 function buildTable(data,gender,years,direction,startNext){
   const tbody=document.querySelector("#spreadTable tbody");
   tbody.innerHTML="";
@@ -496,13 +537,12 @@ function buildTable(data,gender,years,direction,startNext){
   const tdPart=`<td class="td-num">${fmtMoney(partPerYear)}</td>`;
   let tdIncome;
   if(y===firstYear){
-
     tdIncome=`<td>
       <input class="input-num" data-year="${y}" 
              value="${firstIncome}" 
              oninput="calcTable(0,0,0,0,0)" />
     </td>`;
-}  else{
+  } else{
     tdIncome=`<td>
       <input class="input-num" data-year="${y}" 
              value="0" 
@@ -514,20 +554,16 @@ function buildTable(data,gender,years,direction,startNext){
   const tdTaxPart=`<td class="td-num" id="taxPart-${y}">0</td>`;
   tr.innerHTML=tdYear+tdPart+tdIncome+tdTot+tdTax+tdTaxPart;
   tbody.appendChild(tr);
+  }
 }
 
-}
-
-/* =========================
-   חישוב טבלה וסיכום
-=========================== */
 function calcTable(data,gender,years,direction,startNext){
    if(!data){
     gender=document.querySelector("input[name=gender]:checked").value;
     direction=document.querySelector("input[name=direction]:checked").value;
     startNext=(direction==="forward" && new Date(document.querySelector("#retireDate").value).getMonth()>=9 && document.querySelector("input[name=startWhen]:checked").value==="next");
     years=parseInt(document.querySelector("#yearsSelect").value)||1;
-     data=calcBase();
+    data=calcBase();
    }
 
   const partPerYear = data.taxable/years;
@@ -552,9 +588,6 @@ function calcTable(data,gender,years,direction,startNext){
   document.querySelector("#sum-years").textContent=years;
 }
 
-/* =========================
-   איפוס נתונים ראשוניים
-=========================== */
 function resetAll(){
   document.querySelectorAll("input").forEach(i=>i.value="");
   document.querySelector("#yearsSelect").innerHTML="";
@@ -563,9 +596,7 @@ function resetAll(){
   document.querySelector("#capNote").style.display="none";
   showPanel(1);
 }
-/* =========================
-   Events
-=========================== */
+
 document.querySelector("#to-step-2").onclick=()=>{
     const requiredFields = ["#grantTotal", "#lastSalary", "#startDate", "#retireDate", "#firstYearIncome"];
     for (const selector of requiredFields) {
@@ -623,14 +654,12 @@ function addYearsOptions(){
     sel.appendChild(opt);
   }
   document.querySelector("#eligibilityText").textContent=`זכאות לפריסה לפי ותק: עד ${maxYears} שנים.`;
-  // Show start option if retiring after Sep
   const retirementMonthDay = new Date(retire).getMonth() * 100 + new Date(retire).getDate();
   if(retirementMonthDay>=830 && document.querySelector("input[name=direction]:checked").value==="forward"){
     document.querySelector("#startOptionWrap").style.display="block";
   } else {
     document.querySelector("#startOptionWrap").style.display="none";
   }
-  // Auto-fill first year income note
   const direction=document.querySelector("input[name=direction]:checked").value;
   if(direction==="forward" && retire.getMonth()<9){
     document.querySelector("#autoFillFirstNote").style.display="block";
@@ -642,4 +671,3 @@ function addYearsOptions(){
 <div style="text-align: center;position: relative;bottom: 10px;">כל הזכויות שמורות לחגי זך</div>
 </body>
 </html>
-
