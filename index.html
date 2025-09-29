@@ -1,530 +1,368 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>סימולטור פרישת מענקים</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-  <style>
-    body {
-      background-color: #f0f2f5;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<title>סימולטור פריסת מענק פרישה — סעיף 8ג</title>
+<style>
+  :root{
+    --bg:#0b1020; --card:#111831; --primary:#4cc9f0; --accent:#b5179e;
+    --ok:#2dd4bf; --warn:#f59e0b; --danger:#ef4444; --muted:#94a3b8; --text:#e6e9ef;
+    --ring: rgba(76,201,240,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:radial-gradient(1200px 600px at 80% -100px, #1b2547, transparent 60%), var(--bg);
+    font-family:system-ui, "Segoe UI", "Heebo", "Rubik", Arial, sans-serif; color:var(--text);
+  }
+  .container{max-width:1100px;margin:0 auto;padding:20px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:42px;height:42px;border-radius:12px;background:
+      radial-gradient(circle at 65% 35%, #7ee8fa, transparent 40%),
+      radial-gradient(circle at 35% 65%, #eec0c6, transparent 40%),
+      linear-gradient(135deg, #3a0ca3, #480ca8 45%, #560bad);
+    box-shadow:0 10px 25px rgba(0,0,0,.25), inset 0 0 12px rgba(255,255,255,.15);
+  }
+  h1{font-size:1.3rem;margin:0 0 2px}
+  .subtitle{color:var(--muted);font-size:1.35rem;background-color: #465076;text-align: center;
+border-radius: 5px;padding: 5px;}
 
-    .app-container {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 50px auto;
-    }
+  /* Stepper */
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:16px 0 10px}
+  .step{
+    position:relative;padding:10px 12px;border-radius:14px;background:#0f1630;border:1px solid #1c254d;
+    color:#a6b1cc;text-align:center;font-size:.9rem;user-select:none;
+  }
+  .step.active{background:linear-gradient(180deg,#131c3f,#0f1630);color:#eaf1ff;
+    font-weight: bold; border-color:#30407a;box-shadow:0 0 0 3px var(--ring)}
+  .step:before{content:"";position:absolute;inset:auto 0 -6px 0;margin:auto;width:50%;height:4px;border-radius:4px;background:transparent;transition:.25s}
+  .step.active:before{background:linear-gradient(90deg,var(--primary),var(--accent))}
 
-    .screen-section {
-      background-color: #ffffff;
-      padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      display: none;
-    }
+  /* Cards / Panels */
+  .panel{
+    position:relative;overflow:hidden;border-radius:18px;background:linear-gradient(180deg,#6a81cc 0%, #213d9a 100%);
+    border:1px solid #1b264d;box-shadow:0 10px 30px rgba(0,0,0,.35);font-weight: bold;
+    padding:18px;display:none;transform:translateY(12px) scale(.98);pointer-events:none;transition:opacity .35s, transform .35s;
+  }
+  .panel.show{display:block;transform:translateY(0) scale(1);pointer-events:auto}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  label{display:block;font-size:.9rem;color:#c2c9db;margin-bottom:6px}
+  .input{
+    width:100%;padding:12px 14px;border-radius:12px;border:1px solid #243058;background:whit;color:black;font-size:1rem;
+    outline:none;transition:.2s;
+  }
+  .input:focus{border-color:#3b4ea3;box-shadow:0 0 0 3px var(--ring)}
+  .help{font-size:.82rem;color:#9aa7c7;margin-top:6px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{
+    padding:12px 16px;border:none;border-radius:12px;background:linear-gradient(90deg,#3a86ff,#4cc9f0);
+    color:white;font-weight:600;cursor:pointer;transition:transform .08s ease, box-shadow .2s;
+    box-shadow:0 8px 18px rgba(76,201,240,.2);
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(1px)}
+  .btn.secondary{background:#1a2246;color:#eaf1ff;border:1px solid #2a366e;box-shadow:none}
+  .btn.warn{background:linear-gradient(90deg,#f97316,#f59e0b)}
+  .btn.ghost{background:transparent;border:1px dashed #3b4ea3;color:#b8c7ff}
+  .stack{display:flex;gap:10px;flex-wrap:wrap}
+  .spacer{height:8px}
+  .pill{padding:8px 12px;border-radius:999px;background:#10193a;border:1px solid #243058;color:#dbe4ff;font-size:.88rem}
+  .note{font-size:.9rem;color:#aab6d6}
+  .mono{font-variant-numeric:tabular-nums;text-align: center;}
+  .kpi{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px
+  }
+  @media (max-width:900px){.kpi{grid-template-columns:1fr 1fr}}
+  .kpi .card{
+    background:#0e1634;border:1px solid #1d2952;border-radius:16px;padding:14px;min-height:84px
+  }
+  .title{white-space: nowrap;}
+  .kpi .title{font-size:.85rem;color:#a8b3d4}
+  .kpi .value{font-size:1.15rem;margin-top:6px;font-weight:700}
 
-    .screen-section.visible {
-      display: block;
-      
-    }
+  /* Table */
+  table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px}
+  thead th{
+    position:sticky;top:0;background:#0f183a;border-bottom:1px solid #26305d;padding:10px;font-size:.92rem;color:#c9d3f3;z-index:1
+  }
+  tbody td{border-bottom:1px dashed #1f2a57;padding:10px;color:#e7ecff}
+  tbody tr:hover{background:#0c1432}
+  .td-num{font-variant-numeric:tabular-nums;text-align:left;direction:ltr}
+  .input-num{
+    width:100%;padding:10px;border-radius:10px;border:1px solid #22305c;background:#0a1230;color:#eaf1ff;direction:ltr;text-align:left
+  }
 
-    /* התאמה למסכים גדולים - Flexbox */
-    @media (min-width: 769px) {
-        .screen-section.visible {
-      width: 500px;
-      
-    }
-      .app-container {
-        flex-direction: row;
-        gap: 50px;
-      }
-      .input-section {
-        max-width: 600px;
-      }
-      .section1and2 {
-        display: flex;
-        flex-direction: row;
-        gap: 30px;
-        max-width: 1000px;
-      }
-      .chart-container {
-        height: 300px;  
-      }
-      #tableSection {
-        width: 1200px;
-      }
-    }
+  /* 3D Pie (SVG illusion) */
+  .pie-wrap{display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px}
+  .pie{
+    width:280px;max-width:100%;
+    filter: drop-shadow(0 14px 24px rgba(0,0,0,.45));
+    transform: perspective(900px) rotateX(18deg);
+  }
+  .legend{display:flex;flex-direction:column;gap:8px}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .swatch{width:14px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,.15)}
+  .swatch.taxable{background:linear-gradient(180deg,#f72585,#b5179e)}
+  .swatch.exempt{background:linear-gradient(180deg,#34d399,#10b981)}
 
-    h2 {
-      color: #2c3e50;
-      font-size: 2.2em;
-      margin-bottom: 30px;
-      border-bottom: 2px solid #3498db;
-      padding-bottom: 10px;
-      text-align: center;
-    }
+  /* Alerts */
+  .alert{border:1px solid #33407a;background:#0d173a;border-radius:12px;padding:10px;font-size:.95rem}
+  .alert.ok{border-color:rgba(45,212,191,.35);background:rgba(13,148,136,.08)}
+  .alert.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08)}
+  .alert.danger{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08)}
 
-    /* שדות קלט */
-    .input-group {
-      margin-bottom: 25px;
-    }
-
-    .input-group label {
-      display: block;
-      font-size: 1.1em;
-      color: #34495e;
-      margin-bottom: 8px;
-    }
-
-    .styled-input {
-      width: 100%;
-      padding: 15px 20px;
-      border: 2px solid #ecf0f1;
-      border-radius: 8px;
-      font-size: 1.2em;
-      color: #2c3e50;
-      transition: all 0.3s ease;
-      box-sizing: border-box;
-    }
-
-    .styled-input:focus {
-      outline: none;
-      border-color: #3498db;
-      box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
-      background-color: #f8f9fa;
-    }
-
-    .styled-input::placeholder {
-      color: #bdc3c7;
-    }
-
-    /* כפתורים */
-    .styled-button {
-      display: block;
-      width: 100%;
-      padding: 15px;
-      background-color: #3498db;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.3em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.1s ease;
-      margin-top: 30px;
-    }
-    
-    .button-group {
-        display: flex;
-        gap: 15px;
-        margin-top: 30px;
-    }
-
-    .button-group .styled-button {
-        width: 100%;
-        margin-top: 0;
-    }
-
-    .styled-button.secondary {
-      background-color: #95a5a6;
-    }
-
-    .styled-button:hover {
-      background-color: #2980b9;
-    }
-    
-    .styled-button.secondary:hover {
-      background-color: #7f8c8d;
-    }
-
-    .styled-button:active {
-      transform: translateY(2px);
-    }
-
-    .input-hint {
-      display: block;
-      font-size: 0.9em;
-      color: #95a5a6;
-      margin-top: 5px;
-    }
-
-    /* עיצוב מסך התוצאות */
-    .results-summary {
-      width: 100%;
-    }
-
-    .chart-container {
-      background-color: #f9f9f9;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      margin-top: 20px;
-    }
-    
-    .result-box {
-      background-color: #ecf0f1;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.3s ease;
-    }
-
-    .result-box:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .result-label {
-      font-size: 1.1em;
-      color: #555;
-      font-weight: bold;
-    }
-
-    .result-value {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #3498db;
-    }
-
-    .highlighted {
-      background-color: #3498db;
-    }
-
-    .highlighted .result-label, .highlighted .result-value {
-      color: #ffffff;
-    }
-    
-    /* עיצוב מסך פריסה */
-    .data-saving{
-        background-color: #e1ece3;
-        color: rgb(87, 21, 219);
-         border-radius: 8px;
-        margin-bottom: 20px;
-    }
-    .data-summary {
-        background-color: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 30px;
-    }
-
-    .data-summary p, .data-saving p{
-        font-size: 1.1em;
-        margin: 5px 0;
-    }
-
-    .data-summary strong {
-        color: #34495e;
-    }
-
-    .distribution-options {
-        margin-top: 20px;
-    }
-
-    .option-group {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .option-group:hover {
-        background-color: #f0f8ff;
-        border-color: #3498db;
-    }
-
-    .option-group.active {
-        background-color: #e6f7ff;
-        border-color: #3498db;
-        box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
-    }
-
-    .radio-label {
-        display: flex;
-        align-items: center;
-        font-size: 1.2em;
-        font-weight: bold;
-        color: #2c3e50;
-        cursor: pointer;
-    }
-
-    .radio-label input[type="radio"] {
-        margin-left: 10px;
-        transform: scale(1.3);
-        cursor: pointer;
-    }
-    
-    .input-group label {
-      font-size: 1em; /* התאמת גודל הפונט לשדה בתוך הקבוצה */
-    }
-    
-    .hidden {
-        display: none !important;
-    }
-    
-    /* עיצוב טבלה - רספונסיביות */
-    .results-table-container {
-      overflow-x: auto;
-      margin-top: 30px;
-    }
-    
-    .results-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: right;
-    }
-    
-    .results-table th, .results-table td {
-      padding: 15px;
-      border: 1px solid #e0e0e0;
-      white-space: nowrap;
-      vertical-align: middle;
-    }
-
-    .results-table td.input-cell {
-        padding: 5px;
-    }
-
-    .results-table td .income-input {
-        width: 120px;
-        padding: 8px;
-        text-align: right;
-    }
-
-    .results-table thead th {
-      background-color: #3498db;
-      color: #fff;
-      font-weight: bold;
-      text-align: center;
-    }
-    
-    .results-table tbody tr:nth-child(even) {
-      background-color: #f7f7f7;
-    }
-    
-    .results-table tbody tr:hover {
-      background-color: #eaf6ff;
-    }
-    
-    .table-totals {
-      font-weight: bold;
-      background-color: #ecf0f1;
-    }
-    
-    .select-group {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 25px;
-    }
-    .select-group label {
-        margin-bottom: 0;
-    }
-
-  </style>
+  .footer-note{margin-top:18px;color:#93a0c2;font-size:.85rem}
+</style>
 </head>
 <body>
-
-<div class="app-container">
-    <div class="section1and2">
-        <section id="inputSection" class="screen-section visible">
-    <h2 style="white-space: nowrap;">נתונים לחישוב מענק פרישה</h2>
-    <form id="retirementForm">  
-        <div class="input-group">
-            <label for="grantAmount" style="font-weight: bold;">סך מענק פרישה למשיכה</label>
-            <input type="text" id="grantAmount" name="grantAmount" placeholder="לדוגמה: 1,500,000" class="styled-input" data-type="currency" required>
-            <span class="input-hint">סה״כ מענקי הפרישה למשיכה בלבד, ללא מענקי פרישה שביקשנו לגביהם רצף קצבה</span>
+  <div class="container">
+    <header>
+      <div class="brand">
+       
+        <div>
+          <h1>סימולטור פריסת מענק פרישה</h1>
+          <div class="subtitle">לפי סעיף 8ג לפקודת מס הכנסה —  פריסת מענקי פרישה</div>
+          <h3 class="adkani">עדכני לנתוני רשות המיסים לשנת 2025</h3>
         </div>
-        <div class="input-group">
-            <label for="grantAmount" style="font-weight: bold;">סך הכנסות בשנת הפרישה</label>
-            <input type="text" id="incomeOfThisYear" name="grantAmount" placeholder="לדוגמה: 350,000" class="styled-input" data-type="currency" required>
-            <span class="input-hint">סה״כ ההכנסות ללא מענק הפרישה למשיכה</span>
-        </div>
-      
-      <div class="input-group">
-        <label for="retirementDate" style="font-weight: bold;">תאריך הפרישה</label>
-        <input type="date" id="retirementDate" name="retirementDate" class="styled-input" required>
-        <span class="input-hint">תאריך הפרישה הוא היום האחרון של העבודה. בהפסקת עבודה עקב מוות, יש לציין את תאריך הפטירה. תאריך הפרישה כפי שמופיע בטופס 161 בחלק ג</span>
       </div>
       
-      <div class="input-group">
-        <label for="seniorityYears" style="font-weight: bold;">תקופת ותק בעבודה (שנים וחלקי שנים)</label>
-        <input type="number" id="seniorityYears" name="seniorityYears" placeholder="לדוגמה: 25.5" class="styled-input" step="0.1" min="0" required>
-        <span class="input-hint">יש למלא את מספר ימי העבודה מתאריך אצל המעביד מתאריך ההתחלה ועד תאריך הפרישה (כולל יום הפרישה), בניכוי ימי חופשה ללא תשלום (חל״ת), מספר הימים מחולק ל-365 נותן את תקופת העבודה בשנים וחלקי שנים.</span>
+    </header>
+
+    <div class="steps">
+      <div class="step active" data-step="1">1. נתונים ראשוניים</div>
+      <div class="step" data-step="2">2. תוצאות בסיס + פאי</div>
+      <div class="step" data-step="3">3. העדפות פריסה</div>
+      <div class="step" data-step="4">4. טבלת שנים,סיכום וחיסכון</div>
+      <div class="step" data-step="5"></div>
     </div>
 
-      <div class="input-group">
-        <label for="lastSalary" style="font-weight: bold;">משכורת חודשית אחרונה</label>
-        <input type="text" id="lastSalary" name="lastSalary" placeholder="לדוגמה: 20,000" class="styled-input" data-type="currency" required>
-        <span class="input-hint">הכנסת עבודה למעט תשלומים שניתנו לעובד לכיסוי הוצאותיו ולמעט שויי שימוש ברכב צמוד, ״משכורת חודש״ אצל עובד יומי היא השכר הממוצע בשניים עשר החודשים שקדמו לפיטורים.</span>
-    </div>
-
-     <!-- <button id="submit" type="submit" class="styled-button">המשך</button>-->
-    </form>
-        </section>
-
-        <section id="resultsSection" class="screen-section visible">
-    <div class="results-summary">
-        <h2>סיכום נתוני פרישה</h2>
-        
-        <div class="result-box">
-            <span class="result-label">תקרת פטור שנתית</span>
-            <span id="annualExemptionLimit" class="result-value"></span>
+    <!-- Panel 1: נתונים ראשוניים -->
+    <section class="panel show" id="panel-1" aria-labelledby="p1-title">
+      <h2 id="p1-title" class="subtitle">מלא/י את הנתונים הראשוניים</h2>
+      <div class="grid">
+        <div>
+          <label>מענק פרישה למשיכה (סה"כ)</label>
+          <input class="input money" id="grantTotal" inputmode="numeric" placeholder="לדוגמה: 250,000.00" required />
+          <div class="help">סכום המענק הכולל לפני פטור/פריסה.</div>
         </div>
+        <div>
+          <label>שכר אחרון (חודשי ברוטו)</label>
+          <input class="input money" id="lastSalary" inputmode="numeric" placeholder="לדוגמה: 12,500.00" required/>
+          <div class="help">משמש לחישוב 150%×שכר אל מול תקרת השכר.</div>
+        </div>
+        <div>
+          <label>תאריך תחילת עבודה</label>
+          <input class="input" id="startDate" type="date" required/>
+          <div class="help">לצורך חישוב הוותק (כולל חלקי שנים).</div>
+        </div>
+        <div>
+          <label>תאריך פרישה</label>
+          <input class="input" id="retireDate" type="date" required />
+          <div class="help">אם פרישה מ־30/09 ואילך — אפשר להתחיל פריסה בשנה העוקבת.</div>
+        </div>
+        <div>
+          <label>הכנסות נוספות בשנת הפרישה (ללא המענק)</label>
+          <input class="input money" id="firstYearIncome" inputmode="numeric" placeholder="לדוגמה: 120,000.00" required />
+          <div class="help">משמשת להשוואה "ללא פריסה" וגם לשורה הראשונה אם מתחילים בשנה הנוכחית.</div>
+        </div>
+      </div>
 
-        <div class="result-box">
-            <span class="result-label">מענק פטור</span>
-            <span id="exemptGrant" class="result-value"></span>
-        </div>
+      <div class="spacer"></div>
+      <div class="stack">
+        <button class="btn" id="to-step-2">המשך לתוצאות הבסיס</button>
+        <button class="btn secondary" id="resetAll" onclick="resetAll()">אפס הכל</button>
+        <span class="note">החישוב מתעדכן בזמן אמת; ניתן לחזור אחורה בכל שלב.</span>
+      </div>
 
-        <div class="result-box highlighted" >
-            <span class="result-label">מענק חייב במס</span>
-            <span id="taxableGrant" class="result-value"></span>
-        </div>
-    </div>
-    
-    <div class="chart-container">
-        <canvas id="grantChart"></canvas>
-    </div>
-    
-    <div class="button-group" style="margin-top: 22%;">
-        <!-- <button id="backToInput" class="styled-button secondary">חזור</button> -->
-        <button id="continueToDistribution" class="styled-button">המשך לפריסה</button>
-    </div>
-        </section>
-    </div>  
-  <section id="distributionSection" class="screen-section">
-    <h2>אפשרויות פריסת מענק</h2>
-
-    <div class="data-summary">
-        <p><strong>שנות ותק:</strong> <span id="summarySeniorityYears"></span> שנים</p>
-        <p><strong>תאריך פרישה:</strong> <span id="summaryRetirementDate"></span></p>
-        <p><strong>שנות פריסה קדימה אפשריות:</strong> <span id="futureYears"></span></p>
-        <p><strong>שנות פריסה אחורה אפשריות:</strong> <span id="pastYears"></span></p>
-    </div>
-    
-    <div class="input-group">
-        <p>בחר מין:</p>
-        <label class="radio-label">
-            <input type="radio" name="gender" value="male" checked>
-            גבר - 2.25 נקודות זיכוי מס
-        </label>
-        <label class="radio-label">
-            <input type="radio" name="gender" value="female">
-            אישה - 2.75 נקודות זיכוי מס
-        </label>
-    </div>
-    
-    <div class="select-group">
-        <label for="distributionYearsSelect">בחר מספר שנות פריסה:</label>
-        <select id="distributionYearsSelect" class="styled-input"></select>
-    </div>
-
-    <div class="distribution-options">
-        <div class="option-group">
-            <label class="radio-label">
-                <input id="forward" type="radio" name="distributionType" value="forward" checked onchange="updateYearsOptions()">
-                פריסה קדימה
-            </label>
-        </div>
-        
-        <div class="option-group forward-options">
-            <p>בחר שנת התחלה:</p>
-            <label class="radio-label">
-                <input type="radio" name="forwardStartYear" value="current" checked >
-                בשנה הנוכחית
-            </label>
-            <label class="radio-label">
-                <input type="radio" name="forwardStartYear" value="next" >
-                בשנה העוקבת
-            </label>
-            
-            <!-- <div id="nextYearIncome" class="input-group hidden">
-                <label for="currentYearIncome">הכנסה חייבת במס בשנת העזיבה</label>
-                <input type="text" id="currentYearIncome" class="styled-input" data-type="currency" placeholder="לדוגמה: 120,000">
-            </div> -->
-        </div>
-        
-        <div class="option-group">
-            <label class="radio-label">
-                <input type="radio" name="distributionType" value="backward"  onchange="updateYearsOptions()">
-                פריסה אחורה
-            </label>
-        </div>
-    </div>
-    
-    <div class="button-group">
-        <button id="backToResults" class="styled-button secondary">חזור</button>
-        <button id="calculateFinal" class="styled-button">חשב פריסה</button>
-    </div>
-  </section>
-  
-  <section id="tableSection" class="screen-section">
-    <h2>טבלת פריסה מפורטת</h2>
-    <div class="results-table-container">
-        <table class="results-table">
-            <thead>
-                <tr>
-                    <th>שנת מס</th>
-                    <th>סכום פריסה</th>
-                    <th>הכנסות צפויות</th>
-                    <th>סה"כ הכנסה</th>
-                    <th>סך המס</th>
-                    <th>מס על המענק</th>
-                    <th>שיעור המס על המענק</th>
-                </tr>
-            </thead>
-            <tbody id="distributionTableBody"></tbody>
-            <tfoot>
-                <tr id="tableTotalsRow" class="table-totals">
-                    <td>סה"כ</td>
-                    <td id="totalDistributionSum"></td>
-                    <td id="totalIncomeSum"></td>
-                    <td id="totalCombinedSum"></td>
-                    <td id="totalTaxSum"></td>
-                    <td id="totalGrantTaxSum"></td>
-                    <td></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-    <section class="data-saving" style="margin-top: 20px;">
-        <p style="margin-top: 20px; font-size: 0.9em; color: #555;"> מס ללא פריסה = <span id="taxWithoutDistribution"></span>  </p>
-        <p style="margin-top: 20px; font-size: 0.9em; color: #555;"> מס כולל פריסה = <span id="taxWithDistribution"></span>  </p>
-        <p style="margin-top: 20px; font-size: 0.9em; color: #555;"> חיסכון במס בפריסה = <span id="taxSavings"></span>  </p>
+      <div class="footer-note">מדרגות מס ונקודות זיכוי נכונות לשנה הנוכחית כפי שסיפקת. ניתן לעדכן בקוד הקבועים בתחילת הסקריפט.</div>
     </section>
-    <div class="button-group">
-        <button id="backToDistribution" class="styled-button secondary">חזור</button>
-        <button id="startOver" class="styled-button">התחל מחדש</button>
-    </div>
-  </section>
-  
-</div>
+
+    <!-- Panel 2: תוצאות בסיס + פאי -->
+    <section class="panel" id="panel-2">
+      <h2 class="subtitle">תוצאות בסיסיות — ותק, פטור, חייב וגרף עוגה</h2>
+
+      <div class="kpi">
+        <div class="card">
+          <div class="title">ותק בעבודה (שנים)</div>
+          <div class="value mono" id="kpi-tenure">0.00</div>
+        </div>
+        <div class="card">
+          <div class="title"> תקרת שכר</div>
+          <div class="value mono" id="kpi-basePerYear">0.00 ש"ח</div>
+        </div>
+        <div class="card">
+          <div class="title">מענק פטור</div>
+          <div class="value mono" id="kpi-exempt">0.00 ש"ח</div>
+        </div>
+        <div class="card">
+          <div class="title">מענק חייב</div>
+          <div class="value mono" id="kpi-taxable">0.00 ש"ח</div>
+        </div>
+      </div>
+
+      <div class="pie-wrap">
+        <svg class="pie" viewBox="0 0 200 200" id="pieSvg" aria-label="חלוקת מענק: פטור / חייב"></svg>
+        <div class="legend">
+          <div class="item"><span class="swatch exempt"></span> פטור</div>
+          <div class="item"><span class="swatch taxable"></span> חייב</div>
+          
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="alert ok" id="capNote" style="display:none"></div>
+
+      <div class="spacer"></div>
+      <div class="stack">
+        <button class="btn secondary goBack" data-back="1">חזרה</button>
+        <button class="btn" id="to-step-3">המשך להעדפות פריסה</button>
+      </div>
+    </section>
+
+    <!-- Panel 3: העדפות פריסה -->
+    <section class="panel" id="panel-3">
+      <h2 class="subtitle">בחר/י העדפות פריסה ונקודות זיכוי</h2>
+
+      <div class="grid">
+        <div>
+          <label>מין ונקודות זיכוי</label>
+          <div class="row">
+            <label class="pill"><input type="radio" name="gender" value="male" checked /> גבר — 2.25 נק'</label>
+            <label class="pill"><input type="radio" name="gender" value="female" /> אישה — 2.75 נק'</label>
+          </div>
+          <div class="help">שווי נקודת זיכוי: 2,904 ש"ח. נלקח בחשבון בכל חישוב מס.</div>
+        </div>
+        <div>
+          <label>כיוון פריסה</label>
+          <div class="row">
+            <label class="pill"><input id="forward" type="radio" name="direction" value="forward" checked onchange="addYearsOptions()" /> קדימה</label>
+            <label class="pill"><input id="backward" type="radio" name="direction" value="backward" onchange="addYearsOptions()" /> אחורה</label>
+          </div>
+          <div class="help">מקסימום כולל: 6 שנים, או לפי הזכאות המוגבלת (הנמוך).</div>
+        </div>
+
+        <div id="startOptionWrap" style="display:none">
+          <label>אם פרישה מ־30/09 ואילך — התחלת הפריסה</label>
+          <div class="row">
+            <label class="pill"><input type="radio" name="startWhen" value="current" checked /> בשנה הנוכחית</label>
+            <label class="pill"><input type="radio" name="startWhen" value="next" /> בשנה העוקבת</label>
+          </div>
+          <div class="help">חל רק בפריסה קדימה.</div>
+        </div>
+
+        <div>
+          <label>שנות פריסה (בחר בין 1 למקסימום האפשרי)</label>
+          <select class="input" id="yearsSelect"></select>
+          <div class="help" id="eligibilityText">זכאות תתעדכן אוטומטית.</div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="stack">
+        <button class="btn secondary goBack" data-back="2">חזרה</button>
+        <button class="btn" id="to-step-4">המשך לטבלת שנים</button>
+      </div>
+    </section>
+
+    <!-- Panel 4: טבלת שנים -->
+    <section class="panel" id="panel-4">
+      <h2 class="subtitle">פרטי הפריסה לפי שנים — הזן הכנסות נוספות לכל שנה</h2>
+
+      <div class="alert warn" id="autoFillFirstNote" style="display:none">
+        לשנה הראשונה הוזנה אוטומטית ההכנסה מהמסך הראשון (כי התחלה בשנה הנוכחית). ניתן לעדכן ידנית.
+      </div>
+
+      <div class="kpi">
+        <div class="card">
+          <div class="title">חלק מענק לשנה</div>
+          <div class="value mono" id="kpi-partPerYear">0.00 ש"ח</div>
+        </div>
+        <div class="card">
+          <div class="title">מדרגות מס פעילות</div>
+          <div class="value mono">מותאם לשנה הנוכחית</div>
+        </div>
+        <div class="card">
+          <div class="title">נקודות זיכוי לשנה</div>
+          <div class="value mono" id="kpi-credits">0.00 ש"ח</div>
+        </div>
+        <div class="card">
+          <div class="title">מס על מלוא המענק בשנה הראשונה (ללא פריסה)</div>
+          <div class="value mono" id="kpi-tax-no-spread">0.00 ש"ח</div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div style="overflow:auto;border:1px solid #22305c;border-radius:12px">
+        <table id="spreadTable" aria-label="טבלת פריסת המענק">
+          <thead>
+            <tr>
+              <th style="width:90px">שנה</th>
+              <th>חלק מענק לשנה</th>
+              <th>הכנסה נוספת</th>
+              <th>סך הכנסה</th>
+              <th>סך המס הכולל</th>
+              <th>מס על חלק המענק</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="stack">
+        <button class="btn secondary goBack" data-back="3">חזרה</button>
+        <button class="btn" id="to-step-5" style="display: none;">המשך לסיכום</button>
+      </div>
+    </section>
+
+    <!-- Panel 5: סיכום וחיסכון במס -->
+    <section class="panel" id="panel-5">
+      <h2 class="subtitle">סיכום וחיסכון במס</h2>
+
+      <div class="kpi">
+        <div class="card">
+          <div class="title">מס על מלוא המענק ללא פריסה (שנה ראשונה)</div>
+          <div class="value mono" id="sum-tax-no-spread">0.00 ש"ח</div>
+        </div>
+        <div class="card">
+          <div class="title">סך מס על חלקי המענק בכל השנים (עם פריסה)</div>
+          <div class="value mono" id="sum-tax-with-spread">0.00 ש"ח</div>
+        </div>
+        <div class="card">
+          <div class="title">חיסכון במס בזכות הפריסה</div>
+          <div class="value mono" id="sum-savings">0.00 ש"ח</div>
+        </div>
+        <div class="card">
+          <div class="title">שנות פריסה שנבחרו</div>
+          <div class="value mono" id="sum-years" >0</div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="alert ok">
+        הערה: החישוב מבוסס על בסיס נתונים שסיפקת. לצרכי תכנון מס סופי מומלץ לוודא מול הוראות החוק העדכניות ולשקול ייעוץ מס.
+      </div>
+
+      <div class="spacer"></div>
+      <div class="stack">
+        <button class="btn secondary goBack" data-back="4" style="display: none;">חזרה</button>
+        <button class="btn ghost" id="restart">התחל מחדש</button>
+      </div>
+    </section>
+
+  </div>
 
 <script>
-  // נתונים קבועים
-  const TAX_FREE_GRANT_PER_YEAR = 13750;
-  const CREDIT_POINT_VALUE = 2904;
-  const INCOME_TAX_BRACKETS = [
+/* =========================
+   קבועים שנתיים (ניתנים לעדכון)
+=========================== */
+const INCOME_TAX_BRACKETS = [
     { limit: 84120, rate: 0.10 },
     { limit: 120720, rate: 0.14 },
     { limit: 193800, rate: 0.20 },
@@ -533,384 +371,275 @@
     { limit: 721560, rate: 0.47 },
     { limit: Infinity, rate: 0.50 }
   ];
-  
-  let taxableGrantAmount = 0;
-  let distributionYearsCount = 0;
-  let distributionType = 'forward';
-  let forwardStartYearType = 'current';
-  let retirementYear = 0;
-  let gender = 'male';
+const CREDIT_POINTS = { male: 2.25, female: 2.75 };
+const DEFAULT_SALARY_CAP = 13750;
+const CREDIT_POINT_VALUE = 2904;
 
-  // פונקציית עזר לחישוב מס לפי מדרגות
-  function calculateTax(income, gender) {
-    let tax = 0;
-    let remainingIncome = income;
-    const creditPoints = gender === 'male' ? 2.25 : 2.75;
-    const creditPointAmount = creditPoints * CREDIT_POINT_VALUE;
+/* =========================
+   כלי עזר לפורמט מספרים
+=========================== */
+function fmtMoney(v){
+  if(isNaN(v) || v==null) v=0;
+  return v.toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2})+" ש\"ח";
+}
+function fmtNum(v){
+  if(isNaN(v) || v==null) v=0;
+  return v.toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function parseNum(el){
+  const raw = (typeof el==="string")? el : el.value;
+  const clean = raw.replace(/[^\d.-]/g,"");
+  return parseFloat(clean)||0;
+}
 
-    for (let i = 0; i < INCOME_TAX_BRACKETS.length; i++) {
-      const bracket = INCOME_TAX_BRACKETS[i];
-      const prevLimit = i > 0 ? INCOME_TAX_BRACKETS[i - 1].limit : 0;
-      const currentBracketIncome = Math.min(remainingIncome, bracket.limit - prevLimit);
-      
-      if (currentBracketIncome <= 0) break;
-      
-      tax += currentBracketIncome * bracket.rate;
-      remainingIncome -= currentBracketIncome;
-    }
-    
-    return Math.max(0, tax - creditPointAmount);
+/* =========================
+   לוגיקת חישוב מס
+=========================== */
+function calcTax(income, gender){
+  let tax=0, prev=0;
+  for(const b of INCOME_TAX_BRACKETS){
+    if(income>prev){
+      const taxable = Math.min(income,b.limit)-prev;
+      tax += taxable*b.rate;
+      prev = b.limit;
+    } else break;
   }
-  
-  // פונקציית עזר לפורמט כספי
-  function formatCurrency(amount) {
-    if (isNaN(amount) || amount < 0) return '0 ₪';
-    return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 0 }).format(amount);
+  const credits = CREDIT_POINTS[gender]*CREDIT_POINT_VALUE;
+  return Math.max(0,tax-credits);
+}
+
+/* =========================
+   מעבר מסכים
+=========================== */
+function showPanel(n){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("show"));
+  document.querySelector("#panel-"+n).classList.add("show");
+  //if(n===2) document.querySelector("#panel-1").classList.add("show");
+  //if(n===3) document.querySelector("#panel-3").classList.add("show");
+  if(n===4) {
+    document.querySelector("#panel-4").classList.add("show")
+    document.querySelector("#panel-5").classList.add("show");
+  };
+
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+  document.querySelector('.step[data-step="'+n+'"]').classList.add("active");
+}
+
+/* =========================
+   חישוב נתוני בסיס
+=========================== */
+function calcBase(){
+  const grantTotal = parseNum(document.querySelector("#grantTotal"));
+  const lastSalary = parseNum(document.querySelector("#lastSalary"));
+  const salaryCap = DEFAULT_SALARY_CAP;
+  const start = new Date(document.querySelector("#startDate").value);
+  const retire = new Date(document.querySelector("#retireDate").value);
+  const tenureYears = (retire-start)/(1000*60*60*24*365);
+  const basePerYear = Math.min(lastSalary*1.5, salaryCap);
+  const exempt = Math.min(grantTotal, tenureYears*basePerYear);
+  const taxable = Math.max(0, grantTotal-exempt);
+
+  document.querySelector("#kpi-tenure").textContent = fmtNum(tenureYears);
+  document.querySelector("#kpi-basePerYear").textContent = fmtMoney(basePerYear);
+  document.querySelector("#kpi-exempt").textContent = fmtMoney(exempt);
+  document.querySelector("#kpi-taxable").textContent = fmtMoney(taxable);
+
+  drawPie(exempt,taxable);
+  return {grantTotal,lastSalary,salaryCap,tenureYears,basePerYear,exempt,taxable};
+}
+
+/* =========================
+   גרף עוגה SVG
+=========================== */
+function drawPie(exempt,taxable){
+  const total = exempt+taxable||1;
+  const pct = taxable/total;
+  const angle = pct*360;
+  const r=100, x = r+ r*Math.sin(angle*Math.PI/180), y = r- r*Math.cos(angle*Math.PI/180);
+  const large = pct>0.5?1:0;
+  let d = `M100,100 L100,0 A100,100 0 ${large} 1 ${x},${y} Z`;
+  if(pct===0) d="";
+  const svg=document.querySelector("#pieSvg");
+  svg.innerHTML="";
+  if(exempt>0){
+    const pathEx=`<circle r="100" cx="100" cy="100" fill="url(#gradEx)" />`;
+    svg.innerHTML+=pathEx;
   }
-
-  // פונקציית עדכון הטבלה וחישוב מחדש
-  function updateTable() {
-    // sumCurrentYearIncome += incomeInRetirementYear;
-    const rows = document.querySelectorAll('#distributionTableBody tr');
-    let newTotalTaxSum = 0;
-    let newTotalGrantTaxSum = 0;
-    let newTotalCombinedSum = 0;
-    let totalDistributionSum = 0;
-    let newTotalIncomeSum = 0;
-    const retirementDateInput = document.getElementById('retirementDate');
-    const retirementDate = retirementDateInput.value;
-    const retirementYear = new Date(retirementDate).getFullYear();
-    
-
-   if(Number(rows[0].children[0].textContent)===Number(retirementYear)){
-            rows[0].children[2].children[0].value=Number(document.getElementById('incomeOfThisYear').value.replace(/,/g, '')) || 0;    
-            rows[0].children[2].children[0].disabled=true;
-        }else{   
-            rows[0].children[2].children[0].disabled=false;
-        }
-    rows.forEach(row => {
-        const distributionPerYear = taxableGrantAmount / distributionYearsCount;
-        const incomeInput = row.children[2].querySelector('input');
-        let sumCurrentYearIncome = Number(document.getElementById('incomeOfThisYear').value.replace(/,/g, '')) || 0; 
-        const incomeThisYear = parseFloat(incomeInput.value) || 0;
-        let newTotalIncomeSum = 0;
-        
-        const combinedIncome = distributionPerYear + incomeThisYear;
-        const taxThisYear = calculateTax(combinedIncome, gender);
-        const taxOnIncome = calculateTax(incomeThisYear, gender);
-        const taxOnGrant = Math.max(0, taxThisYear - taxOnIncome);
-        const grantTaxRate = distributionPerYear > 0 ? (taxOnGrant / distributionPerYear) * 100 : 0;
-        
-        row.children[1].textContent = formatCurrency(distributionPerYear);
-        row.children[3].textContent = formatCurrency(combinedIncome);
-        row.children[4].textContent = formatCurrency(taxThisYear);
-        row.children[5].textContent = formatCurrency(taxOnGrant);
-        row.children[6].textContent = `${grantTaxRate.toFixed(2)}%`;
-
-        totalDistributionSum += distributionPerYear;
-        newTotalIncomeSum += incomeThisYear;
-        newTotalTaxSum += taxThisYear;
-        newTotalGrantTaxSum += taxOnGrant;
-        newTotalCombinedSum += combinedIncome;
-    });
-        
-    document.getElementById('totalDistributionSum').textContent = formatCurrency(totalDistributionSum);
-    document.getElementById('totalIncomeSum').textContent = formatCurrency(newTotalIncomeSum);
-    document.getElementById('totalCombinedSum').textContent = formatCurrency(newTotalCombinedSum);
-    document.getElementById('totalTaxSum').textContent = formatCurrency(newTotalTaxSum);
-    document.getElementById('totalGrantTaxSum').textContent = formatCurrency(newTotalGrantTaxSum);
-
-    document.getElementById('taxWithoutDistribution').textContent = formatCurrency(taxForOneYear()) ;
-    document.getElementById('taxWithDistribution').textContent = formatCurrency(newTotalTaxSum);
-    document.getElementById('taxSavings').textContent = formatCurrency(taxForOneYear() - newTotalTaxSum);
-
-    
+  if(taxable>0){
+    const pathTx=`<path d="${d}" fill="url(#gradTx)" />`;
+    svg.innerHTML+=pathTx;
   }
-  
-  // פונקציה שמפעילה את החישובים ועדכון המסך הראשון
-  function updateResultsSection() {
-    const grantAmount = parseFloat(document.getElementById('grantAmount').value.replace(/,/g, ''));
-    const lastSalary = parseFloat(document.getElementById('lastSalary').value.replace(/,/g, ''));
-    const seniorityYears = parseFloat(document.getElementById('seniorityYears').value);
+  const defs=`<defs>
+    <linearGradient id="gradEx" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#10b981"/></linearGradient>
+    <linearGradient id="gradTx" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#f72585"/><stop offset="100%" stop-color="#b5179e"/></linearGradient>
+  </defs>`;
+  svg.innerHTML=defs+svg.innerHTML;
+}
 
-    const annualExemptionLimit = Math.min(lastSalary * 1.5, TAX_FREE_GRANT_PER_YEAR);
-    const totalExemptGrant = seniorityYears * annualExemptionLimit;
-    const taxableGrant = grantAmount - totalExemptGrant;
-    taxableGrantAmount = taxableGrant;
+/* =========================
+   יצירת טבלה
+=========================== */
+function buildTable(data,gender,years,direction,startNext){
+  const tbody=document.querySelector("#spreadTable tbody");
+  tbody.innerHTML="";
+  const partPerYear = data.taxable/years;
+  document.querySelector("#kpi-partPerYear").textContent=fmtMoney(partPerYear);
+  document.querySelector("#kpi-credits").textContent=fmtMoney(CREDIT_POINTS[gender]*CREDIT_POINT_VALUE);
 
-    document.getElementById('annualExemptionLimit').textContent = formatCurrency(annualExemptionLimit);
-    document.getElementById('exemptGrant').textContent = formatCurrency(totalExemptGrant);
-    document.getElementById('taxableGrant').textContent = formatCurrency(taxableGrant);
-    
-    // יצירת/עדכון הגרף
-    const chartCanvas = document.getElementById('grantChart');
-    if (chartCanvas.chart) {
-        chartCanvas.chart.destroy();
-    }
+  const firstIncome=parseNum(document.querySelector("#firstYearIncome"));
+  const firstYear=new Date(document.querySelector("#retireDate").value).getFullYear();
+  let startYear=(direction==="forward")? (startNext?firstYear+1:firstYear):(firstYear);
+  for(let i=0;i<years;i++){
+  const y=(direction==="forward")? startYear+i : startYear-i;
+  const tr=document.createElement("tr");
+  const tdYear=`<td>${y}</td>`;
+  const tdPart=`<td class="td-num">${fmtMoney(partPerYear)}</td>`;
+  let tdIncome;
+  if(y===firstYear){
 
-    const ctx = chartCanvas.getContext('2d');
-    const chartData = {
-        labels: ['מענק חייב במס', 'מענק פטור ממס'],
-        datasets: [{
-            data: [taxableGrant, totalExemptGrant],
-            backgroundColor: ['#e74c3c', '#2ecc71'],
-            hoverOffset: 4
-        }]
-    };
-    
-    const myChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: chartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom' },
-                tooltip: {
-                    callbacks: {
-                        label: (context) => `${context.label}: ${formatCurrency(context.raw)}`
-                    }
-                },
-                datalabels: {
-                    color: '#fff',
-                    formatter: (value) => formatCurrency(value),
-                    font: { weight: 'bold', size: 14 },
-                    anchor: 'center',
-                    align: 'center'
-                }
-            }
-        }
-    });
-    chartCanvas.chart = myChart;
+    tdIncome=`<td>
+      <input class="input-num" data-year="${y}" 
+             value="${firstIncome}" 
+             oninput="calcTable(0,0,0,0,0)" />
+    </td>`;
+}  else{
+    tdIncome=`<td>
+      <input class="input-num" data-year="${y}" 
+             value="0" 
+             oninput="calcTable(0,0,0,0,0)" />
+    </td>`;
   }
+  const tdTot=`<td class="td-num" id="tot-${y}">0</td>`;
+  const tdTax=`<td class="td-num" id="tax-${y}">0</td>`;
+  const tdTaxPart=`<td class="td-num" id="taxPart-${y}">0</td>`;
+  tr.innerHTML=tdYear+tdPart+tdIncome+tdTot+tdTax+tdTaxPart;
+  tbody.appendChild(tr);
+}
 
-  document.addEventListener('DOMContentLoaded', () => {
-    // ---- רכיבי HTML ----
-    const inputSection = document.getElementById('inputSection');
-    const resultsSection = document.getElementById('resultsSection');
-    const distributionSection = document.getElementById('distributionSection');
-    const tableSection = document.getElementById('tableSection');
+}
 
-    const grantAmountInput = document.getElementById('grantAmount');
-    const seniorityYearsInput = document.getElementById('seniorityYears');
-    const lastSalaryInput = document.getElementById('lastSalary');
-    const retirementDateInput = document.getElementById('retirementDate');
-    
-    const form = document.getElementById('retirementForm');
-    const backToInputBtn = document.getElementById('backToInput');
-    const continueToDistributionBtn = document.getElementById('continueToDistribution');
-    const backToResultsBtn = document.getElementById('backToResults');
-    const calculateFinalBtn = document.getElementById('calculateFinal');
-    const backToDistributionBtn = document.getElementById('backToDistribution');
-    const startOverBtn = document.getElementById('startOver');
-    
-    const forwardOptions = document.querySelector('.forward-options');
-    //const nextYearIncomeInput = document.getElementById('nextYearIncome');
-    const distributionTableBody = document.getElementById('distributionTableBody');
-    const distributionYearsSelect = document.getElementById('distributionYearsSelect');
-    
-    // ---- לוגיקת עיצוב הקלט ----
-    const currencyInputs = document.querySelectorAll('[data-type="currency"]');
-    currencyInputs.forEach(input => {
-      input.addEventListener('input', (e) => {
-        const value = e.target.value.replace(/,/g, '');
-        const formattedValue = new Intl.NumberFormat('he-IL').format(value);
-        e.target.value = formattedValue;
-        updateResultsSection();
-      });
-    });
+/* =========================
+   חישוב טבלה וסיכום
+=========================== */
+function calcTable(data,gender,years,direction,startNext){
+   if(!data){
+    gender=document.querySelector("input[name=gender]:checked").value;
+    direction=document.querySelector("input[name=direction]:checked").value;
+    startNext=(direction==="forward" && new Date(document.querySelector("#retireDate").value).getMonth()>=9 && document.querySelector("input[name=startWhen]:checked").value==="next");
+    years=parseInt(document.querySelector("#yearsSelect").value)||1;
+     data=calcBase();
+   }
 
-    seniorityYearsInput.addEventListener('input', updateResultsSection);
-    
-    // ---- לוגיקת מעבר בין מסכים ----
-    
-    // מסך 1 -> 2
-   /* form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      // החישוב מתבצע כבר ב-input listeners, כאן רק מעבר בין מסכים
-      //inputSection.classList.remove('visible');
-      //inputSection.style.width = '500px';
-      submit.style.display="none";
-      resultsSection.classList.add('visible');
-    });
+  const partPerYear = data.taxable/years;
+  let sumTaxWithSpread=0;
+  document.querySelectorAll("#spreadTable tbody tr").forEach(tr=>{
+    const y=tr.children[0].textContent;
+    const income=parseNum(tr.querySelector("input"));
+    const total=income+partPerYear;
+    const taxWith=calcTax(total,gender);
+    const taxWithout=calcTax(income,gender);
+    const diff=taxWith-taxWithout;
+    document.querySelector("#tot-"+y).textContent=fmtMoney(total);
+    document.querySelector("#tax-"+y).textContent=fmtMoney(taxWith);
+    document.querySelector("#taxPart-"+y).textContent=fmtMoney(diff);
+    sumTaxWithSpread+=diff;
+  });
+  const noSpread=calcTax(data.taxable+parseNum(document.querySelector("#firstYearIncome")),gender)-calcTax(parseNum(document.querySelector("#firstYearIncome")),gender);
+  document.querySelector("#kpi-tax-no-spread").textContent=fmtMoney(noSpread);
+  document.querySelector("#sum-tax-no-spread").textContent=fmtMoney(noSpread);
+  document.querySelector("#sum-tax-with-spread").textContent=fmtMoney(sumTaxWithSpread);
+  document.querySelector("#sum-savings").textContent=fmtMoney(noSpread-sumTaxWithSpread);
+  document.querySelector("#sum-years").textContent=years;
+}
 
-    // מסך 2 -> 1
-    backToInputBtn.addEventListener('click', () => {
-        resultsSection.classList.remove('visible');
-        inputSection.classList.add('visible');
-        submit.style.display="block";
-    });
-*/
-    // מסך 2 -> 3
-    continueToDistributionBtn.addEventListener('click', () => {
-        if (!form.checkValidity()) {
-            form.reportValidity();
+/* =========================
+   איפוס נתונים ראשוניים
+=========================== */
+function resetAll(){
+  document.querySelectorAll("input").forEach(i=>i.value="");
+  document.querySelector("#yearsSelect").innerHTML="";
+  document.querySelector("#spreadTable tbody").innerHTML="";
+  document.querySelector("#autoFillFirstNote").style.display="none";
+  document.querySelector("#capNote").style.display="none";
+  showPanel(1);
+}
+/* =========================
+   Events
+=========================== */
+document.querySelector("#to-step-2").onclick=()=>{
+    const requiredFields = ["#grantTotal", "#lastSalary", "#startDate", "#retireDate", "#firstYearIncome"];
+    for (const selector of requiredFields) {
+        const el = document.querySelector(selector);
+        if (!el.value) {
+            Swal.fire({
+            title: "<span style='color: white; font-size: 16px;'> נדרש למלא את כל השדות</span>" ,
+            width: "30%", 
+            icon: "warning",
+            timer: 2000, 
+            showConfirmButton: false,
+            timerProgressBar: true, 
+            background: "#5a6aa3",
+            customClass: {
+            popup: 'swal2-center-custom'
+          }       
+         });
+            el.focus();
             return;
         }
-        inputSection.classList.remove('visible');
-        const seniorityYears = parseFloat(seniorityYearsInput.value);
-        const retirementDate = retirementDateInput.value;
-        retirementYear = new Date(retirementDate).getFullYear();
-        let maxYears;
-        const futureYears = Math.min(Math.round(seniorityYears / 4), 6);
-        const pastYears = Math.min(Math.ceil(seniorityYears), 6);
-        const retirementMonthDay = new Date(retirementDate).getMonth() * 100 + new Date(retirementDate).getDate();
-        if(retirementMonthDay <830) { 
-           forwardOptions.classList.add('hidden');
-       } 
-        distributionYearsSelect.innerHTML = '';
-        for (let i = 1; i <= futureYears; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i + ' שנים';
-            distributionYearsSelect.appendChild(option);
-        }
-        distributionYearsCount = parseInt(distributionYearsSelect.value);
-
-        document.getElementById('summarySeniorityYears').textContent = seniorityYears;
-        document.getElementById('summaryRetirementDate').textContent = new Date(retirementDate).toLocaleDateString('he-IL');
-        document.getElementById('futureYears').textContent = futureYears;
-        document.getElementById('pastYears').textContent = pastYears;
-        
-        resultsSection.classList.remove('visible');
-        distributionSection.classList.add('visible');
-    });
-
-    // מסך 3 -> 2
-    backToResultsBtn.addEventListener('click', () => {
-        distributionSection.classList.remove('visible');
-        resultsSection.classList.add('visible');
-        inputSection.classList.add('visible');
-    });
-    
-    // ---- לוגיקת אפשרויות פריסה ----
-    document.querySelectorAll('input[name="gender"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            gender = e.target.value;
-        });
-    });
-
-    distributionYearsSelect.addEventListener('change', (e) => {
-        distributionYearsCount = parseInt(e.target.value);
-    });
-
-    document.querySelectorAll('input[name="distributionType"]').forEach(radio => {
-        
-
-        radio.addEventListener('change', (e) => {
-            const retirementDateInput = document.getElementById('retirementDate');
-            const retirementDate = retirementDateInput.value;
-            const retirementMonthDay = new Date(retirementDate).getMonth() * 100 + new Date(retirementDate).getDate();
-            distributionType = e.target.value;
-                forwardOptions.classList.toggle('hidden', distributionType !== 'forward');
-                //nextYearIncomeInput.classList.add('hidden');
-            document.querySelectorAll('.option-group').forEach(group => group.classList.remove('active'));
-            e.target.closest('.option-group').classList.add('active');
-             if(retirementMonthDay <830) {
-              forwardOptions.classList.add('hidden');
-              }
-        });
-
-    });
-
-    document.querySelectorAll('input[name="forwardStartYear"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            forwardStartYearType = e.target.value;
-            //nextYearIncomeInput.classList.toggle('hidden', forwardStartYearType !== 'next');
-        });
-    });
-    
-    // ---- מסך 3 -> 4: בניית הטבלה וחישובים סופיים ----
-    calculateFinalBtn.addEventListener('click', () => {
-        distributionTableBody.innerHTML = '';
-        const incomeInRetirementYear = parseFloat(document.getElementById('incomeOfThisYear').value.replace(/,/g, '')) || 0;
-        const distributionPerYear = taxableGrantAmount / distributionYearsCount;
-
-        for (let i = 0; i < distributionYearsCount; i++) {
-            const row = document.createElement('tr');
-            
-            let year;
-            if (distributionType === 'forward') {
-                year = forwardStartYearType === 'current' ? retirementYear + i : retirementYear + 1 + i;
-            } else { // אחורה
-                year = retirementYear - i;
-            }
-            
-            const initialIncomeThisYear = (distributionType === 'forward' && forwardStartYearType === 'next' && i === 0) ? 0 : 0;
-            
-            row.innerHTML = `
-                <td>${year}</td>
-                <td>${formatCurrency(distributionPerYear)}</td>
-                <td class="input-cell">
-                    <input type="number" class="income-input styled-input" value="${initialIncomeThisYear}" min="0" step="1000">
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            `;
-            distributionTableBody.appendChild(row);
-        }
-
-        updateTable(); // חישוב ראשוני של הטבלה
-
-        // אזינה לשינויים בשדות הקלט בטבלה
-        document.querySelectorAll('.income-input').forEach(input => {
-            input.addEventListener('input', updateTable);
-        });
-
-        distributionSection.classList.remove('visible');
-        tableSection.classList.add('visible');
-    });
-
-    // מסך 4 -> 3
-    backToDistributionBtn.addEventListener('click', () => {
-        tableSection.classList.remove('visible');
-        distributionSection.classList.add('visible');
-    });
-
-    // חזרה להתחלה
-    startOverBtn.addEventListener('click', () => {
-        taxForOneYear();return;
-        tableSection.classList.remove('visible');
-        inputSection.classList.add('visible');
-        resultsSection.classList.add('visible');
-        document.getElementById('retirementForm').reset();
-        document.getElementById('annualExemptionLimit').textContent = "";
-        document.getElementById('exemptGrant').textContent = "";
-        document.getElementById('taxableGrant').textContent = "";
-    });
-  });
-
-  function updateYearsOptions(){
-
-    const seniorityYears = parseFloat(document.getElementById('seniorityYears').value);
-    const futureYears = Math.min(Math.round(seniorityYears / 4), 6);
-    const pastYears = Math.min(Math.ceil(seniorityYears), 6);
-    let maxYears;
-    if (document.getElementById('forward').checked) {
-       maxYears = futureYears;
-    } else {
-          maxYears = pastYears;
     }
-    
-    distributionYearsSelect.innerHTML = '';
-    for (let i = 1; i <= maxYears; i++) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = i + ' שנים';
-        distributionYearsSelect.appendChild(option);
-    }
-    distributionYearsCount = parseInt(distributionYearsSelect.value);
+    const d=calcBase();showPanel(2);
+};
+document.querySelector("#to-step-3").onclick=()=>{showPanel(3);addYearsOptions();};
+document.querySelector("#to-step-4").onclick=()=>{
+  const retire = new Date(document.querySelector("#retireDate").value);
+  const retirementMonthDay = new Date(retire).getMonth() * 100 + new Date(retire).getDate();
+  const gender=document.querySelector("input[name=gender]:checked").value;
+  const direction=document.querySelector("input[name=direction]:checked").value;
+  const startNext=(direction==="forward" && retirementMonthDay>=830 && document.querySelector("input[name=startWhen]:checked").value==="next");
+  const years=parseInt(document.querySelector("#yearsSelect").value)||1;
+  const d=calcBase();
+  buildTable(d,gender,years,direction,startNext);
+  calcTable(d,gender,years,direction,startNext);
+  showPanel(4);
+};
+
+document.querySelectorAll(".goBack").forEach(b=>b.onclick=()=>{showPanel(b.dataset.back);
+});
+document.querySelector("#restart").onclick=()=>{location.reload();};
+
+function addYearsOptions(){
+  const tenureYears=Number(document.querySelector("#kpi-tenure").textContent) || 0;
+  const retire = new Date(document.querySelector("#retireDate").value);
+
+  let maxYears=Math.min(6,Math.round(tenureYears/4));
+  if(document.getElementById("backward").checked){
+    maxYears=Math.min(6,Math.floor(tenureYears));
   }
-  function taxForOneYear(){
-    let sumCurrentYearIncome = Number(document.getElementById('incomeOfThisYear').value.replace(/,/g, '')) || 0;  
-    let sumGrantIncome=Number(document.getElementById('grantAmount').value.replace(/,/g, ''));
-    let sumTotalIncome=sumCurrentYearIncome+sumGrantIncome;
-    
-   return Number(calculateTax(sumTotalIncome)-calculateTax(sumCurrentYearIncome)) || 0;
+  const sel=document.querySelector("#yearsSelect");
+  sel.innerHTML="";
+  for(let i=1;i<=maxYears;i++){
+    const opt=document.createElement("option");
+    opt.value=i; opt.textContent=i;
+    sel.appendChild(opt);
   }
+  document.querySelector("#eligibilityText").textContent=`זכאות לפריסה לפי ותק: עד ${maxYears} שנים.`;
+  // Show start option if retiring after Sep
+  const retirementMonthDay = new Date(retire).getMonth() * 100 + new Date(retire).getDate();
+  if(retirementMonthDay>=830 && document.querySelector("input[name=direction]:checked").value==="forward"){
+    document.querySelector("#startOptionWrap").style.display="block";
+  } else {
+    document.querySelector("#startOptionWrap").style.display="none";
+  }
+  // Auto-fill first year income note
+  const direction=document.querySelector("input[name=direction]:checked").value;
+  if(direction==="forward" && retire.getMonth()<9){
+    document.querySelector("#autoFillFirstNote").style.display="block";
+  } else {
+    document.querySelector("#autoFillFirstNote").style.display="none";
+  }
+}
 </script>
+<div style="text-align: center;position: relative;bottom: 10px;">כל הזכויות שמורות לחגי זך</div>
 </body>
 </html>
 
