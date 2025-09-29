@@ -19,7 +19,6 @@
   }
   .container{max-width:1100px;margin:0 auto;padding:20px}
   @media (max-width:768px){.container{padding:12px}}
-  
   header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
   .brand{display:flex;align-items:center;gap:12px}
   .logo{
@@ -212,12 +211,14 @@ border-radius: 5px;padding: 5px;}
       <div class="grid">
         <div>
           <label>מענק פרישה למשיכה (סה"כ)</label>
-          <input class="input money" id="grantTotal" inputmode="numeric" placeholder="לדוגמה: 250,000.00" required />
+          <input class="input money" id="grantTotal" inputmode="numeric" placeholder="לדוגמה: 250,000.00" 
+          value="" required />
           <div class="help">סכום המענק הכולל לפני פטור/פריסה.</div>
         </div>
         <div>
           <label>שכר אחרון (חודשי ברוטו)</label>
-          <input class="input money" id="lastSalary" inputmode="numeric" placeholder="לדוגמה: 12,500.00" required/>
+          <input class="input money" id="lastSalary" inputmode="numeric" placeholder="לדוגמה: 12,500.00"
+          value="" required/>
           <div class="help">משמש לחישוב 150%×שכר אל מול תקרת השכר.</div>
         </div>
         <div>
@@ -232,7 +233,8 @@ border-radius: 5px;padding: 5px;}
         </div>
         <div>
           <label>הכנסות נוספות בשנת הפרישה (ללא המענק)</label>
-          <input class="input money" id="firstYearIncome" inputmode="numeric" placeholder="לדוגמה: 120,000.00" required />
+          <input class="input money" id="firstYearIncome" inputmode="numeric" placeholder="לדוגמה: 120,000.00" 
+          value="" required />
           <div class="help">משמשת להשוואה "ללא פריסה" וגם לשורה הראשונה אם מתחילים בשנה הנוכחית.</div>
         </div>
       </div>
@@ -379,9 +381,12 @@ border-radius: 5px;padding: 5px;}
       </div>
 
       <div class="spacer"></div>
-      <div class="stack">
+      <div class="stack" style="justify-content: space-between; flex-wrap: wrap;gap: 10px; ">
         <button class="btn secondary goBack" data-back="3">חזרה</button>
-        <button class="btn" id="to-step-5" style="display: none;">המשך לסיכום</button>
+        <input class="btn" id="equalSum" type="checkbox" value="" onchange="equalSum()"><span style="padding: 5px 0px;">סכום אחיד</span></button>
+        <input class="input-num" id="sumEqualSum" inputmode="numeric" placeholder="100,000.00"
+        style="max-width: 100px;" oninput="equalSum()"/>
+
       </div>
     </section>
 
@@ -529,6 +534,8 @@ function buildTable(data,gender,years,direction,startNext){
 
   const firstIncome=parseNum(document.querySelector("#firstYearIncome"));
   const firstYear=new Date(document.querySelector("#retireDate").value).getFullYear();
+  
+    
   let startYear=(direction==="forward")? (startNext?firstYear+1:firstYear):(firstYear);
   for(let i=0;i<years;i++){
   const y=(direction==="forward")? startYear+i : startYear-i;
@@ -539,15 +546,15 @@ function buildTable(data,gender,years,direction,startNext){
   if(y===firstYear){
     tdIncome=`<td>
       <input class="input-num" data-year="${y}" 
-             value="${firstIncome}" 
+             value="${fmtNum(firstIncome)}" 
              oninput="calcTable(0,0,0,0,0)" />
     </td>`;
-  } else{
+  } else{    
     tdIncome=`<td>
-      <input class="input-num" data-year="${y}" 
-             value="0" 
-             oninput="calcTable(0,0,0,0,0)" />
-    </td>`;
+            <input class="input-num" data-year="${y}" 
+            value="0" 
+            oninput="calcTable(0,0,0,0,0)" />
+            </td>`;
   }
   const tdTot=`<td class="td-num" id="tot-${y}">0</td>`;
   const tdTax=`<td class="td-num" id="tax-${y}">0</td>`;
@@ -667,8 +674,28 @@ function addYearsOptions(){
     document.querySelector("#autoFillFirstNote").style.display="none";
   }
 }
+function equalSum(){
+    const retire = new Date(document.querySelector("#retireDate").value);
+    equalSumChecked = document.querySelector("#equalSum").checked;
+    if(equalSumChecked){
+        const equalSumValue = parseNum(document.querySelector("#sumEqualSum"));
+        document.querySelectorAll("#spreadTable tbody tr").forEach(tr=>{
+            if(tr.firstChild.textContent!==retire.getFullYear().toString()){
+                tr.querySelector("input").value=fmtNum(equalSumValue);
+            } 
+        });
+       calcTable(0,0,0,0,0);
+    } 
+    else{
+        document.querySelectorAll("#spreadTable tbody tr").forEach(tr=>{
+             if(tr.firstChild.textContent!==retire.getFullYear().toString()){
+                tr.querySelector("input").value="0";
+             }
+        });
+       calcTable(0,0,0,0,0);
+    }
+}
 </script>
 <div style="text-align: center;position: relative;bottom: 10px;">כל הזכויות שמורות לחגי זך</div>
 </body>
 </html>
-
