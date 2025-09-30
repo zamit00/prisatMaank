@@ -33,7 +33,8 @@
   
   .subtitle{color:var(--muted);font-size:1.35rem;background-color: #465076;text-align: center;
 border-radius: 5px;padding: 5px;}
-  @media (max-width:768px){.subtitle{font-size:1rem;padding:8px}}
+    .subtitleBold{font-size:1.35rem;font-weight: bold;background-color: #465076;text-align: center;}
+  @media (max-width:768px){.subtitle{font-size:1rem;padding:8px};.subtitleBold{font-size:1rem;padding:8px;font-weight: bold;}}
   
   .adkani{font-size:1.05rem;color:#d4e0ff;margin:4px 0 0;font-weight:500}
   @media (max-width:768px){.adkani{font-size:.85rem;margin:2px 0 0}}
@@ -199,7 +200,7 @@ border-radius: 5px;padding: 5px;}
 
     <div class="steps">
       <div class="step active" data-step="1">1. נתונים ראשוניים</div>
-      <div class="step" data-step="2">2. תוצאות בסיס + פאי</div>
+      <div class="step" data-step="2">2. תוצאות בסיס</div>
       <div class="step" data-step="3">3. העדפות פריסה</div>
       <div class="step" data-step="4">4. טבלת שנים,סיכום וחיסכון</div>
       <div class="step" data-step="5" style="display: none;"></div>
@@ -207,7 +208,7 @@ border-radius: 5px;padding: 5px;}
 
     <!-- Panel 1: נתונים ראשוניים -->
     <section class="panel show" id="panel-1" aria-labelledby="p1-title">
-      <h2 id="p1-title" class="subtitle">מלא/י את הנתונים הראשוניים</h2>
+      <h2 id="p1-title" class="subtitleBold">מלא/י את הנתונים הראשוניים</h2>
       <div class="grid">
         <div>
           <label>מענק פרישה למשיכה (סה"כ)</label>
@@ -219,23 +220,23 @@ border-radius: 5px;padding: 5px;}
           <label>שכר אחרון (חודשי ברוטו)</label>
           <input class="input money" id="lastSalary" inputmode="numeric" placeholder="לדוגמה: 12,500.00"
           value="" required/>
-          <div class="help">משמש לחישוב 150%×שכר אל מול תקרת השכר.</div>
+          <div class="help">משמש לחישוב תקרת השכר הפטור.</div>
         </div>
         <div>
           <label>תאריך תחילת עבודה</label>
           <input class="input" id="startDate" type="date" required/>
-          <div class="help">לצורך חישוב הוותק (כולל חלקי שנים).</div>
+          <div class="help">משמש לחישוב הוותק (כולל חלקי שנים).</div>
         </div>
         <div>
           <label>תאריך פרישה</label>
           <input class="input" id="retireDate" type="date" required />
-          <div class="help">אם פרישה מ־30/09 ואילך — אפשר להתחיל פריסה בשנה העוקבת.</div>
+          <!--<div class="help">אם פרישה מ־30/09 ואילך — אפשר להתחיל פריסה בשנה העוקבת.</div>-->
         </div>
         <div>
           <label>הכנסות נוספות בשנת הפרישה (ללא המענק)</label>
           <input class="input money" id="firstYearIncome" inputmode="numeric" placeholder="לדוגמה: 120,000.00" 
           value="" required />
-          <div class="help">משמשת להשוואה "ללא פריסה" וגם לשורה הראשונה אם מתחילים בשנה הנוכחית.</div>
+          <div class="help">משמשת להשוואה "ללא פריסה" וגם לשנה הראשונה אם מתחילים בשנה הנוכחית.</div>
         </div>
       </div>
 
@@ -246,12 +247,12 @@ border-radius: 5px;padding: 5px;}
         <span class="note">החישוב מתעדכן בזמן אמת; ניתן לחזור אחורה בכל שלב.</span>
       </div>
 
-      <div class="footer-note">מדרגות מס ונקודות זיכוי נכונות לשנה הנוכחית כפי שסיפקת. ניתן לעדכן בקוד הקבועים בתחילת הסקריפט.</div>
+      <!--<div class="footer-note">מדרגות מס ונקודות זיכוי נכונות לשנה הנוכחית כפי שסיפקת.</div>-->
     </section>
 
     <!-- Panel 2: תוצאות בסיס + פאי -->
     <section class="panel" id="panel-2">
-      <h2 class="subtitle">תוצאות בסיסיות — ותק, פטור, חייב וגרף עוגה</h2>
+      <h2 class="subtitle">תוצאות בסיסיות — ותק, פטור, חייב</h2>
 
       <div class="kpi">
         <div class="card">
@@ -301,7 +302,7 @@ border-radius: 5px;padding: 5px;}
             <label class="pill"><input type="radio" name="gender" value="male" checked /> גבר — 2.25 נק'</label>
             <label class="pill"><input type="radio" name="gender" value="female" /> אישה — 2.75 נק'</label>
           </div>
-          <div class="help">שווי נקודת זיכוי: 2,904 ש"ח. נלקח בחשבון בכל חישוב מס.</div>
+          <div class="help">שווי נקודת זיכוי לשנת 2025: 2,904 ש"ח. נלקח בחשבון בכל חישוב מס.</div>
         </div>
         <div>
           <label>כיוון פריסה</label>
@@ -309,7 +310,7 @@ border-radius: 5px;padding: 5px;}
             <label class="pill"><input id="forward" type="radio" name="direction" value="forward" checked onchange="addYearsOptions()" /> קדימה</label>
             <label class="pill"><input id="backward" type="radio" name="direction" value="backward" onchange="addYearsOptions()" /> אחורה</label>
           </div>
-          <div class="help">מקסימום כולל: 6 שנים, או לפי הזכאות המוגבלת (הנמוך).</div>
+          <div class="help"> 6 שנים או לפי חישוב הזכאות  (לפי הנמוך).</div>
         </div>
 
         <div id="startOptionWrap" style="display:none">
@@ -340,7 +341,7 @@ border-radius: 5px;padding: 5px;}
       <h2 class="subtitle">פרטי הפריסה לפי שנים — הזן הכנסות נוספות לכל שנה</h2>
 
       <div class="alert warn" id="autoFillFirstNote" style="display:none">
-        לשנה הראשונה הוזנה אוטומטית ההכנסה מהמסך הראשון (כי התחלה בשנה הנוכחית). ניתן לעדכן ידנית.
+        לשנה הראשונה הוזנה אוטומטית ההכנסה מהמסך הראשון (כי התחלה בשנה הנוכחית). 
       </div>
 
       <div class="kpi">
